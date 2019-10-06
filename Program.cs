@@ -169,8 +169,7 @@ namespace NumberToWords
             // TODO: 3. Optimize cases in switch ???
             // TODO: 4. Write comments
             // TODO: 5. Move parsing algorithm to separate class
-            // TODO: 6. Move extesionsn to separate file
-            // TODO: 7. Move input to app aruments
+            // TODO: 6. Move input to app aruments
 
             const String rawInput = "0,25";
 
