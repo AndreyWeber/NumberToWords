@@ -51,8 +51,7 @@ namespace NumberToWords
 
         private static String IntegerToWords(String input)
         {
-            var result = String.Empty;
-            var sb = new StringBuilder();
+            var result = new StringBuilder();
             void Traverse(String token)
             {
                 if (token.Equals(String.Empty))
@@ -63,145 +62,67 @@ namespace NumberToWords
                 switch (token.Length)
                 {
                     case 1: // 1
-                        result = result.Equals(String.Empty)
-                            ? units[token]
-                            : $"{result} {units[token]}";
-                        sb.AppendWithLeadingWhitespace(units[token]);
+                        result.AppendWithLeadingWhitespace(units[token]);
                         break;
                     case 2: // 10
                         if (token.StartsWith("0"))
                         {
-                            if (token.EndsWith("0")) // '00' cases
-                            {
-                                Traverse(token.Substring(2));
-                            }
-                            else // '0x' cases
-                            {
-                                Traverse(token.Substring(1));
-                            }
+                            Traverse(token.EndsWith("0")
+                                ? token.Substring(2) // '00' cases
+                                : token.Substring(1) // '0x' cases
+                            );
                             break;
                         }
 
                         if (token.StartsWith("1"))
                         {
-                            result = result.Equals(String.Empty)
-                                ? twoDigits[token]
-                                : $"{result} {twoDigits[token]}";
-                            sb.AppendWithLeadingWhitespace(twoDigits[token]);
+                            result.AppendWithLeadingWhitespace(twoDigits[token]);
                         }
                         else
                         {
-                            if (token.EndsWith("0"))
-                            {
-                                result = result.Equals(String.Empty)
+                            result.AppendWithLeadingWhitespace(
+                                token.EndsWith("0")
                                     ? dozens[token.StrAtPos(0)]
-                                    : $"{result} {dozens[token.StrAtPos(0)]}";
-                                sb.AppendWithLeadingWhitespace(dozens[token.StrAtPos(0)]);
-                            }
-                            else
-                            {
-                                result = result.Equals(String.Empty)
-                                    ? $"{dozens[token.StrAtPos(0)]}-{units[token.Last().ToString()]}"
-                                    : $"{result} {dozens[token.StrAtPos(0)]}-{units[token.Last().ToString()]}";
-                                sb.AppendWithLeadingWhitespace(
-                                    $"{dozens[token.StrAtPos(0)]}-{units[token.Last().ToString()]}");
-                            }
+                                    : $"{dozens[token.StrAtPos(0)]}-{units[token.Last().ToString()]}"
+                            );
                         }
                         break;
                     case 3 when !token.StartsWith("0"): // 100
-                        // if (token.StartsWith("0"))
-                        // {
-                        //     Traverse(token.Substring(1));
-                        //     break;
-                        // }
-
-                        result = result.Equals(String.Empty)
-                                ? $"{units[token.StrAtPos(0)]} hundred"
-                                : $"{result} {units[token.StrAtPos(0)]} hundred";
-                        sb.AppendWithLeadingWhitespace($"{units[token.StrAtPos(0)]} hundred");
+                        result.AppendWithLeadingWhitespace($"{units[token.StrAtPos(0)]} hundred");
                         Traverse(token.Substring(1));
                         break;
                     case 4 when !token.StartsWith("0"): // 1 000
-                        // if (token.StartsWith("0"))
-                        // {
-                        //     Traverse(token.Substring(1));
-                        //     break;
-                        // }
-
-                        result = result.Equals(String.Empty)
-                            ? $"{units[token.StrAtPos(0)]} thousand"
-                            : $"{result} {units[token.StrAtPos(0)]} thousand";
-                        sb.AppendWithLeadingWhitespace($"{units[token.StrAtPos(0)]} thousand");
+                        result.AppendWithLeadingWhitespace($"{units[token.StrAtPos(0)]} thousand");
                         Traverse(token.Substring(1));
                         break;
-                    case 5: // 10 000
-                        if (token.StartsWith("0"))
-                        {
-                            Traverse(token.Substring(1));
-                            break;
-                        }
-
+                    case 5 when !token.StartsWith("0"): // 10 000
                         if (token.StartsWith("1"))
                         {
-                            result = result.Equals(String.Empty)
-                                ? $"{twoDigits[token.Substring(0, 2)]} thousand"
-                                : $"{result} {twoDigits[token.Substring(0, 2)]} thousand";
-                            sb.AppendWithLeadingWhitespace($"{twoDigits[token.Substring(0, 2)]} thousand");
+                            result.AppendWithLeadingWhitespace($"{twoDigits[token.Substring(0, 2)]} thousand");
                         }
                         else
                         {
-                            if (token.StrAtPos(1).Equals("0"))
-                            {
-                                result = result.Equals(String.Empty)
+                            result.AppendWithLeadingWhitespace(
+                                token.StrAtPos(1).Equals("0")
                                     ? $"{dozens[token.StrAtPos(0)]} thousand"
-                                    : $"{result} {dozens[token.StrAtPos(0)]} thousand";
-                                sb.AppendWithLeadingWhitespace($"{dozens[token.StrAtPos(0)]} thousand");
-                            }
-                            else
-                            {
-                                result = result.Equals(String.Empty)
-                                    ? $"{dozens[token.StrAtPos(0)]}-{units[token.StrAtPos(1)]} thousand"
-                                    : $"{result} {dozens[token.StrAtPos(0)]}-{units[token.StrAtPos(1)]} thousand";
-                                sb.AppendWithLeadingWhitespace(
-                                    $"{dozens[token.StrAtPos(0)]}-{units[token.StrAtPos(1)]} thousand");
-                            }
+                                    : $"{dozens[token.StrAtPos(0)]}-{units[token.StrAtPos(1)]} thousand"
+                            );
                         }
                         Traverse(token.Substring(2)); // move to hundreds
                         break;
-                    case 6: // 100 000
-                        if (token.StartsWith("0"))
-                        {
-                            Traverse(token.Substring(1));
-                            break;
-                        }
-
+                    case 6 when !token.StartsWith("0"): // 100 000
                         if (token.StrAtPos(1).Equals("0") && token.StrAtPos(2).Equals("0")) // '100 xxx' cases
                         {
-                            result = result.Equals(String.Empty)
-                                ? $"{units[token.StrAtPos(0)]} hundred thousand"
-                                : $"{result} {units[token.StrAtPos(0)]} hundred thousand";
-                            sb.AppendWithLeadingWhitespace($"{units[token.StrAtPos(0)]} hundred thousand");
+                            result.AppendWithLeadingWhitespace($"{units[token.StrAtPos(0)]} hundred thousand");
                             Traverse(token.Substring(2));
                             break;
                         }
 
-                        result = result.Equals(String.Empty)
-                                ? $"{units[token.StrAtPos(0)]} hundred"
-                                : $"{result} {units[token.StrAtPos(0)]} hundred";
-                        sb.AppendWithLeadingWhitespace($"{units[token.StrAtPos(0)]} hundred");
+                        result.AppendWithLeadingWhitespace($"{units[token.StrAtPos(0)]} hundred");
                         Traverse(token.Substring(1));
                         break;
-                    case 7: // 1 000 000
-                        if (token.StartsWith("0"))
-                        {
-                            Traverse(token.Substring(1));
-                            break;
-                        }
-
-                        result = result.Equals(String.Empty)
-                                ? $"{units[token.StrAtPos(0)]} million"
-                                : $"{result} {units[token.StrAtPos(0)]} million";
-                        sb.AppendWithLeadingWhitespace($"{units[token.StrAtPos(0)]} million");
+                    case 7 when !token.StartsWith("0"): // 1 000 000
+                        result.AppendWithLeadingWhitespace($"{units[token.StrAtPos(0)]} million");
                         Traverse(token.Substring(1));
                         break;
                     // case 8: // 10 000 000
@@ -209,34 +130,30 @@ namespace NumberToWords
                     // case 9: // 100 000 000
                     //     break;
                     default:
-                        // throw new ArgumentOutOfRangeException(
-                        //     nameof(input), input.Length, "Integer part is out of range");
                         Traverse(token.Substring(1));
                         break;
                 }
             }
 
             Traverse(input);
-            var sbStr = sb.ToString();
-            return result;
+
+            return result.ToString();
         }
 
         private static String DecimalToWords(String input) => String.Empty;
 
         public static void Main(string[] args)
         {
-            // TODO: 1. Optimization
-            // TODO: 2. Use StringBuilder. Extension method AppendWithLeadingWhitespace()
-            // TODO: 3. Implement unit tests
-            // TODO: 4. Implement input data check
-            // TODO: 5. Implement dividing on dollars and cents
-            // TODO: 6. Implement cents parsing
-            // TODO: 7. Implement adding 'dollar(s)', 'cent(s)' suffixes
+            // TODO: 1. Implement unit tests
+            // TODO: 2. Implement input data check
+            // TODO: 3. Implement dividing on dollars and cents
+            // TODO: 4. Implement cents parsing
+            // TODO: 5. Implement adding 'dollar(s)', 'cent(s)' suffixes
 
             //! Length > 0 && Length <= 9 - for Int part
             //! Length >= 1 && Length <= 2 - for Decimal part
 
-            const String rawInput = "7110011";
+            const String rawInput = "7111111";
 
             var input = new String(rawInput.Where(c => !c.Equals(' ')).ToArray());
 
