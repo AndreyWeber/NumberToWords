@@ -114,7 +114,7 @@ namespace NumberToWords
                         if (token.StrAtPos(1).Equals("0") && token.StrAtPos(2).Equals("0")) // '100 xxx' cases
                         {
                             result.AppendWithLeadingWhitespace($"{units[token.StrAtPos(0)]} hundred thousand");
-                            Traverse(token.Substring(2));
+                            Traverse(token.Substring(2)); // move to thousands
                             break;
                         }
 
@@ -125,10 +125,32 @@ namespace NumberToWords
                         result.AppendWithLeadingWhitespace($"{units[token.StrAtPos(0)]} million");
                         Traverse(token.Substring(1));
                         break;
-                    // case 8: // 10 000 000
-                    //     break;
-                    // case 9: // 100 000 000
-                    //     break;
+                    case 8 when !token.StartsWith("0"): // 10 000 000
+                        if (token.StartsWith("1"))
+                        {
+                            result.AppendWithLeadingWhitespace($"{twoDigits[token.Substring(0, 2)]} million");
+                        }
+                        else
+                        {
+                            result.AppendWithLeadingWhitespace(
+                                token.StrAtPos(1).Equals("0")
+                                    ? $"{dozens[token.StrAtPos(0)]} million"
+                                    : $"{dozens[token.StrAtPos(0)]}-{units[token.StrAtPos(1)]} million"
+                            );
+                        }
+                        Traverse(token.Substring(2)); // move to millions
+                        break;
+                    case 9 when !token.Equals("0"): // 100 000 000
+                        if (token.StrAtPos(1).Equals("0") && token.StrAtPos(2).Equals("0")) // '100 xxx xxx' cases
+                        {
+                            result.AppendWithLeadingWhitespace($"{units[token.StrAtPos(0)]} hundred million");
+                            Traverse(token.Substring(2)); // move to hundred thousands
+                            break;
+                        }
+
+                        result.AppendWithLeadingWhitespace($"{units[token.StrAtPos(0)]} hundred");
+                        Traverse(token.Substring(1));
+                        break;
                     default:
                         Traverse(token.Substring(1));
                         break;
@@ -149,15 +171,17 @@ namespace NumberToWords
             // TODO: 3. Implement dividing on dollars and cents
             // TODO: 4. Implement cents parsing
             // TODO: 5. Implement adding 'dollar(s)', 'cent(s)' suffixes
+            // TODO: 6. Optimize cases in switch ???
 
             //! Length > 0 && Length <= 9 - for Int part
             //! Length >= 1 && Length <= 2 - for Decimal part
 
-            const String rawInput = "7111111";
+            const String rawInput = "286010001";
 
             var input = new String(rawInput.Where(c => !c.Equals(' ')).ToArray());
 
-            Console.WriteLine(IntegerToWords(input));
+            var words = IntegerToWords(input);
+            Console.WriteLine(words);
 
             // Console.ReadKey();
         }
