@@ -162,28 +162,86 @@ namespace NumberToWords
             return result.ToString();
         }
 
-        private static String DecimalToWords(String input) => String.Empty;
-
         public static void Main(string[] args)
         {
             // TODO: 1. Implement unit tests
-            // TODO: 2. Implement input data check
-            // TODO: 3. Implement dividing on dollars and cents
-            // TODO: 4. Implement cents parsing
-            // TODO: 5. Implement adding 'dollar(s)', 'cent(s)' suffixes
-            // TODO: 6. Optimize cases in switch ???
+            // TODO: 2. Optimize input data check - move to separate methods
+            // TODO: 3. Optimize cases in switch ???
+            // TODO: 4. Write comments
+            // TODO: 5. Move parsing algorithm to separate class
+            // TODO: 6. Move extesionsn to separate file
+            // TODO: 7. Move input to app aruments
 
-            //! Length > 0 && Length <= 9 - for Int part
-            //! Length >= 1 && Length <= 2 - for Decimal part
+            const String rawInput = "0,25";
 
-            const String rawInput = "286010001";
+            var inputTokens = new String(rawInput.Where(c => !c.Equals(' ')).ToArray())
+                .Split(',', StringSplitOptions.None);
 
-            var input = new String(rawInput.Where(c => !c.Equals(' ')).ToArray());
+            // Validate input value format
+            if (inputTokens.Length == 0 || inputTokens.Length > 2)
+            {
+                Console.WriteLine($"ERROR! Invalid input number format: {rawInput}");
+                Console.WriteLine("Application will stop now");
+                return;
+            }
 
-            var words = IntegerToWords(input);
-            Console.WriteLine(words);
+            // Validate integer part
+            var dollars = inputTokens[0];
+            if (!Int32.TryParse(dollars, out var dRes))
+            {
+                Console.WriteLine($"ERROR! Invalid input number integer part format: {dollars}");
+                Console.WriteLine("Application will stop now");
+                return;
+            }
 
+            if (dollars.Length == 0 || dollars.Length > 9)
+            {
+                Console.WriteLine($"ERROR! Invalid input number integer part length: {dollars}");
+                Console.WriteLine("Valid length from 1 up to 9 digits");
+                Console.WriteLine("Application will stop now");
+                return;
+            }
+
+            // Convert integer part to words
+            var dollarWords = IntegerToWords(dollars);
+            dollarWords = dollars.EndsWith("1") && !dollars.EndsWith("11")
+                ? $"{dollarWords} dollar"
+                : $"{dollarWords} dollars";
+
+            // There is no decimal part. Execution finished
+            if (inputTokens.Length < 2)
+            {
+                Console.WriteLine($"Output: {dollarWords}");
+                return;
+            }
+
+            // Validate decimal part
+            var cents = inputTokens[1].Equals("1") ? "10" : inputTokens[1];
+            if (!Int32.TryParse(cents, out var cRes))
+            {
+                Console.WriteLine($"ERROR! Invalid input number decimal part format: {cents}");
+                Console.WriteLine("Application will stop now");
+                return;
+            }
+
+            if (cents.Length == 0 || cents.Length > 2)
+            {
+                Console.WriteLine($"ERROR! Invalid input number decimal part length: {cents}");
+                Console.WriteLine("Valid length from 1 up to 2 digits");
+                Console.WriteLine("Application will stop now");
+                return;
+            }
+
+            var centWords = IntegerToWords(cents);
+            centWords = cents.EndsWith("1") && !cents.EndsWith("11")
+                ? $"{centWords} cent"
+                : $"{centWords} cents";
+
+            Console.WriteLine($"Output: {dollarWords} and {centWords}");
+
+#if DEBUG
             // Console.ReadKey();
+#endif
         }
     }
 
