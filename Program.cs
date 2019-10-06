@@ -244,25 +244,4 @@ namespace NumberToWords
 #endif
         }
     }
-
-    public static class Extensions
-    {
-        public static StringBuilder AppendWithLeadingWhitespace(this StringBuilder sb, String toAppend)
-        {
-            if (String.IsNullOrWhiteSpace(toAppend))
-            {
-                return sb;
-            }
-
-            return sb.Length == 0
-                ? sb.Append(toAppend)
-                : sb.Append($" {toAppend}");
-        }
-
-        public static String StrAtPos(this String @string, UInt16 position) =>
-            position <= @string.Length - 1
-                ? (@string.ToCharArray()[position] - '0').ToString()
-                : throw new ArgumentOutOfRangeException(
-                    nameof(position), $"Argument can't be greater, than argument '{nameof(@string)}' length = {@string.Length}");
-    }
 }
