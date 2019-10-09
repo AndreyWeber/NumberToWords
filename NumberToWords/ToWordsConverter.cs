@@ -8,7 +8,7 @@ namespace NumberToWords
     /// <summary>
     /// Converter of numbers to word representation
     /// </summary>
-    public class WordConverter
+    public static class ToWordsConverter
     {
         #region Private static fields
 
@@ -59,21 +59,27 @@ namespace NumberToWords
         #region Public static methods
 
         /// <summary>
-        /// Convert string representation of integer from digit form to word form
+        /// Convert string representation of integer to word form
         /// </summary>
-        /// <param name="intNumber" type="String">Integer in digit form</param>
-        /// <returns>Integer in word form</returns>
-        public static String IntNumToWords(String intNumber)
+        /// <param name="intAsString" type="String">String representing integer</param>
+        /// <returns>String representing integer in word form</returns>
+        public static String IntToWords(String intAsString)
         {
-            if (String.IsNullOrWhiteSpace(intNumber))
+            if (String.IsNullOrWhiteSpace(intAsString))
             {
                 return String.Empty;
             }
 
-            if (!Int32.TryParse(intNumber, out var res))
+            if (!Int32.TryParse(intAsString, out var res))
             {
                 throw new ArgumentException(
-                    $"Argument is not an Integer: {intNumber}", nameof(intNumber));
+                    $"Argument is not an Integer: {intAsString}", nameof(intAsString));
+            }
+
+            // Consider strings looking like "00", "000", etc. as 'zero'
+            if (res == 0)
+            {
+                intAsString = "0";
             }
 
             var result = new StringBuilder();
@@ -182,7 +188,7 @@ namespace NumberToWords
                 }
             }
 
-            Traverse(intNumber);
+            Traverse(intAsString);
 
             return result.ToString();
         }

@@ -9,7 +9,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": ".NET Build",
-            "program": "${workspaceFolder}/bin/Debug/netcoreapp3.0/NumberToWords.exe",
+            "program": "${workspaceFolder}/NumberToWords/bin/Debug/netcoreapp3.0/NumberToWords.exe",
             "args": [],
             "console": "externalTerminal",
             "stopAtEntry": false,
