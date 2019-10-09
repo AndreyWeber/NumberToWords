@@ -1,7 +1,5 @@
 using System;
 
-using NumberToWords;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace NumberToWords.Tests

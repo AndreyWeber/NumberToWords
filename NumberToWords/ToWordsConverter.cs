@@ -10,6 +10,12 @@ namespace NumberToWords
     /// </summary>
     public static class ToWordsConverter
     {
+        /***********************************************************************
+         * Main idea of my solution is to assign words to a digits of a number *
+         * and figure out rules how to combine those words depending on amount *
+         * of digits in a number                                               *
+         ***********************************************************************/
+
         #region Private static fields
 
         private static IDictionary<String, String> units = new Dictionary<String, String>
@@ -70,19 +76,20 @@ namespace NumberToWords
                 return String.Empty;
             }
 
-            if (!Int32.TryParse(intAsString, out var res))
+            if (!intAsString.All(Char.IsDigit))
             {
                 throw new ArgumentException(
                     $"Argument is not an Integer: {intAsString}", nameof(intAsString));
             }
 
             // Consider strings looking like "00", "000", etc. as 'zero'
-            if (res == 0)
+            if (intAsString.All(c => c == '0'))
             {
                 intAsString = "0";
             }
 
             var result = new StringBuilder();
+            // Traverse input string from begin to end
             void Traverse(String token)
             {
                 if (token.Equals(String.Empty))
@@ -90,6 +97,15 @@ namespace NumberToWords
                     return;
                 }
 
+                // Looks like some branches in switch below
+                // can be merged. I decided not to do it to preserve
+                // code readability
+                // NOTE: I decided to make switch with 9 branches,
+                //       because we have strictly determined task
+                //       conditions
+                //       From my perspective, it doesn't make sense
+                //       to make more generic solution for numbers
+                //       with any amount of digits
                 switch (token.Length)
                 {
                     case 1: // 1
@@ -139,13 +155,13 @@ namespace NumberToWords
                                     : $"{dozens[token.StrAtPos(0)]}-{units[token.StrAtPos(1)]} thousand"
                             );
                         }
-                        Traverse(token.Substring(2)); // move to hundreds
+                        Traverse(token.Substring(2)); // traverse to hundreds
                         break;
                     case 6 when !token.StartsWith("0"): // 100 000
                         if (token.StrAtPos(1).Equals("0") && token.StrAtPos(2).Equals("0")) // '100 xxx' cases
                         {
                             result.AppendWithLeadingWhitespace($"{units[token.StrAtPos(0)]} hundred thousand");
-                            Traverse(token.Substring(2)); // move to thousands
+                            Traverse(token.Substring(2)); // traverse to thousands
                             break;
                         }
 
@@ -169,13 +185,13 @@ namespace NumberToWords
                                     : $"{dozens[token.StrAtPos(0)]}-{units[token.StrAtPos(1)]} million"
                             );
                         }
-                        Traverse(token.Substring(2)); // move to millions
+                        Traverse(token.Substring(2)); // traverse to millions
                         break;
                     case 9 when !token.Equals("0"): // 100 000 000
                         if (token.StrAtPos(1).Equals("0") && token.StrAtPos(2).Equals("0")) // '100 xxx xxx' cases
                         {
                             result.AppendWithLeadingWhitespace($"{units[token.StrAtPos(0)]} hundred million");
-                            Traverse(token.Substring(2)); // move to hundred thousands
+                            Traverse(token.Substring(2)); // traverse to hundred thousands
                             break;
                         }
 
